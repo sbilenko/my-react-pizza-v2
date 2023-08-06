@@ -1,8 +1,32 @@
 import React from 'react';
 
-function Sort() {
+function Sort({ categories }) {
+    const [activeCategory, setActiveCategory] = React.useState(0);
+    const [visiblePopup, setVisiblePopup] = React.useState(false);
+    const sortRef = React.useRef();
+    const sortWordRef = categories[activeCategory];
+
+    const onClickCategory = index => {
+        setActiveCategory(index);
+        setVisiblePopup(false);
+    };
+
+    const togglePopup = () => {
+        setVisiblePopup(!visiblePopup);
+    };
+
+    const outsideClick = e => {
+        if (!e.composedPath().includes(sortRef.current)) {
+            setVisiblePopup(false);
+        }
+    };
+
+    React.useEffect(() => {
+        document.body.addEventListener('click', outsideClick);
+    }, []);
+
     return (
-        <div className="sort">
+        <div className="sort" ref={sortRef}>
             <div className="sort__label">
                 <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -11,15 +35,24 @@ function Sort() {
                     />
                 </svg>
                 <b>Сортировка по:</b>
-                <span>популярности</span>
+                <span onClick={togglePopup}>{sortWordRef}</span>
             </div>
-            <div className="sort__popup">
-                <ul>
-                    <li className="active">популярности</li>
-                    <li>цене</li>
-                    <li>алфавиту</li>
-                </ul>
-            </div>
+            {visiblePopup && (
+                <div className="sort__popup">
+                    <ul>
+                        {categories &&
+                            categories.map((category, index) => (
+                                <li
+                                    onClick={() => onClickCategory(index)}
+                                    className={activeCategory === index ? 'active' : ''}
+                                    key={index}
+                                >
+                                    {category}
+                                </li>
+                            ))}
+                    </ul>
+                </div>
+            )}
         </div>
     );
 }
