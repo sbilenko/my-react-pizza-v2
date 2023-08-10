@@ -10,11 +10,11 @@ body {
 }
 
 .wrapper {
-    width: calc(100vw - 100px);
+    width: calc(105vw - 100px);
     height: 100%;
     background-color: #fff;
     margin: 0 auto;
-    border-radius: 10px;
+    border-radius: 50px;
     max-width: 1400px;
 }
 
@@ -28,7 +28,12 @@ body {
     &__items {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        justify-content: center;
         text-align: center;
+
+        &--cart {
+            display: block;
+        }
     }
 
     &__top {

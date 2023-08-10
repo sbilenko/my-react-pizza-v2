@@ -1,16 +1,14 @@
 import React from 'react';
 
-function Sort({ categories }) {
-    const [activeCategory, setActiveCategory] = React.useState(0);
+function Sort({ value, onClickSort, categories }) {
     const [visiblePopup, setVisiblePopup] = React.useState(false);
     const sortRef = React.useRef();
-    const sortWordRef = categories[activeCategory];
 
-    const onClickCategory = index => {
-        setActiveCategory(index);
+    const onClickCategory = prop => {
+        onClickSort(prop);
         setVisiblePopup(false);
     };
-
+    
     const togglePopup = () => {
         setVisiblePopup(!visiblePopup);
     };
@@ -35,19 +33,19 @@ function Sort({ categories }) {
                     />
                 </svg>
                 <b>Сортировка по:</b>
-                <span onClick={togglePopup}>{sortWordRef}</span>
+                <span onClick={togglePopup}>{value.name}</span>
             </div>
             {visiblePopup && (
                 <div className="sort__popup">
                     <ul>
                         {categories &&
-                            categories.map((category, index) => (
+                            categories.map((obj, index) => (
                                 <li
-                                    onClick={() => onClickCategory(index)}
-                                    className={activeCategory === index ? 'active' : ''}
+                                    onClick={() => onClickCategory(obj)}
+                                    className={value.property === obj.property ? 'active' : ''}
                                     key={index}
                                 >
-                                    {category}
+                                    {obj.name}
                                 </li>
                             ))}
                     </ul>
