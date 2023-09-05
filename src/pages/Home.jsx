@@ -1,43 +1,61 @@
 import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
+import { setGategoryId } from '../redux/slices/filterSlice'
 import Categories from '../components/Categories';
 import Sort from '../components/Sort';
 import PizzaBlock from '../components/PizzaBlock';
 import Skeleton from '../components/PizzaBlock/Skeleton';
+import Pagination from '../components/Pagination';
+import { SearchContext } from '../App';
 
-function Home({ searchValue, setSearchValue }) {
+function Home() {
+    const dispatch = useDispatch();
+    const categoryId = useSelector(state => state.filter.categoryId)
+    const { searchValue } = React.useContext(SearchContext);
     const [pizzas, setPizzas] = React.useState([]);
+    const [currentPage, setCurrentPage] = React.useState(1);
     const [isLoading, setIsLoading] = React.useState(true);
-    const [activeCategory, setActiveCategory] = React.useState(0);
+    // const [categoryId, setCategoryId] = React.useState(0);
     const [activeSort, setActiveSort] = React.useState({
         name: 'популярности',
         property: 'rating',
     });
+
+    const onClickCategory = (id) => {
+        dispatch(setGategoryId(id));
+    }
 
     React.useEffect(() => {
         setIsLoading(true);
 
         const sortBy = activeSort.property.replace('-', '');
         const order = activeSort.property.includes('-') ? 'desc' : 'asc';
-        const category = activeCategory > 0 ? `category=${activeCategory}` : '';
-        const search = searchValue ? `name=${searchValue}` : '';
-
-        fetch(`https://64cf3019ffcda80aff51ab33.mockapi.io/pizzas?${category}${search}&sortBy=${sortBy}&order=${order}`)
+        const category = categoryId > 0 ? `category=${categoryId}` : '';
+        const search = searchValue.toLowerCase() ? `&name=${searchValue.toLowerCase()}` : '';
+        
+        fetch(
+            `https://64cf3019ffcda80aff51ab33.mockapi.io/pizzas?page=${currentPage}&limit=4${category}&sortBy=${sortBy}&order=${order}${search}`
+        )
             .then(response => response.json())
             .then(data => {
                 setPizzas(data);
-                console.log(data);
                 setIsLoading(false);
             });
         window.scrollTo(0, 0);
-    }, [activeCategory, activeSort, searchValue]);
+    }, [categoryId, activeSort, searchValue, currentPage]);
+
+    const addSkeletons = [...new Array(4)].map((_, index) => <Skeleton className="pizza-block" key={index} />);
+    // const addStaticFilteredPizzas = pizzas.filter(pizza =>
+    //     pizza.name.toLowerCase().includes(searchValue.toLowerCase())
+    // );
 
     return (
         <React.Fragment>
             <div className="content__top">
-                <Categories
-                    value={activeCategory}
-                    onClickCategory={index => setActiveCategory(index)}
+                <Categories 
+                    value={categoryId}
+                    onClickCategory={onClickCategory}
                     categories={['Все', 'Мясные', 'Вегетарианская', 'Гриль', 'Острые', 'Закрытые']}
                 />
                 <Sort
@@ -56,8 +74,9 @@ function Home({ searchValue, setSearchValue }) {
             <h2 className="content__title">Все пиццы</h2>
             <div className="content__items">
                 {isLoading
-                    ? [...new Array(9)].map((_, index) => <Skeleton className="pizza-block" key={index} />)
-                    : pizzas.map(pizza => (
+                    ? addSkeletons
+                    : // addStaticFilteredPizzas
+                      pizzas.map(pizza => (
                           <PizzaBlock
                               id={pizza.id}
                               name={pizza.name}
@@ -72,6 +91,7 @@ function Home({ searchValue, setSearchValue }) {
                             <PizzaBlock {...pizza} key={pizza + pizza.name}/>
                         ))} */}
             </div>
+            <Pagination onChangePage={number => setCurrentPage(number)} />
         </React.Fragment>
     );
 }
