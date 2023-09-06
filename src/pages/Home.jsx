@@ -19,7 +19,7 @@ function Home() {
     // const [categoryId, setCategoryId] = React.useState(0);
     const [activeSort, setActiveSort] = React.useState({
         name: 'популярности',
-        property: 'rating',
+        property: 'rating', 
     });
 
     const onClickCategory = (id) => {

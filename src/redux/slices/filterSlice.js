@@ -9,7 +9,7 @@ const initialState = {
 };
 
 export const filterSlice = createSlice({
-    name: 'filters',
+    name: 'filters', 
     initialState,
     reducers: {
         setGategoryId(state, action) {
